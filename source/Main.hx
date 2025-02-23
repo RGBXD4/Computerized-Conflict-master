@@ -21,10 +21,14 @@ import Discord.DiscordClient;
 #if CRASH_HANDLER
 import openfl.events.UncaughtErrorEvent;
 import haxe.CallStack;
-import haxe.io.Path;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.Process;
+#end
+import haxe.io.Path;
+#if android
+import android.content.Context;
+import android.os.Build;
 #end
 
 using StringTools;
@@ -52,6 +56,10 @@ class Main extends Sprite
 	public function new()
 	{
 		super();
+
+		#if android
+		Sys.setCwd(Path.addTrailingSlash(Context.getExternalFilesDir()));
+		#end
 
 		if (stage != null)
 		{
@@ -82,7 +90,6 @@ class Main extends Sprite
 		FlxTransitionableState.skipNextTransOut = true;
 		addChild(new FlxGame(game.width, game.height, game.initialState, #if (flixel < "5.0.0") 1, #end game.framerate, game.framerate, game.skipSplash, game.startFullscreen));
 
-		#if !mobile
 		fpsVar = new FPS(10, 3, 0xFFFFFF);
 		addChild(fpsVar);
 		Lib.current.stage.align = "tl";
@@ -90,7 +97,6 @@ class Main extends Sprite
 		if(fpsVar != null) {
 			fpsVar.visible = ClientPrefs.showFPS;
 		}
-		#end
 
 		#if html5
 		FlxG.autoPause = false;
